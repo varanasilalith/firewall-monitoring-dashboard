@@ -8,13 +8,11 @@ import sqlite3
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse, StreamingResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "firewall.db"
-STATIC_DIR = BASE_DIR / "static"
 
 
 def get_db():
@@ -154,13 +152,6 @@ app = FastAPI(
     description="Local demo dashboard backed by sample firewall events."
     , lifespan=lifespan
 )
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-
-
-@app.get("/", include_in_schema=False)
-def home():
-    return FileResponse(STATIC_DIR / "index.html")
-
 
 @app.get("/api/health")
 def health():
