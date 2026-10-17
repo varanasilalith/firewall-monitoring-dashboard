@@ -1,4 +1,15 @@
+const API_BASE = "https://firewall-monitoring-dashboard.onrender.com";
 const $ = (id) => document.getElementById(id);
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://YOUR-USERNAME.github.io"
+    ],
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+)
 let activityChart = null;
 let outcomeChart = null;
 let refreshTimer = null;
@@ -160,3 +171,23 @@ $("export-btn").addEventListener("click", () => { window.location.href = "/api/e
 refreshAll();
 refreshTimer = setInterval(() => refreshAll(), 15000);
 window.addEventListener("beforeunload", () => clearInterval(refreshTimer));
+async function api(path, options = {}) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
+
+  if (!response.ok) {
+    let detail = `Request failed (${response.status})`;
+    try {
+      const body = await response.json();
+      detail = body.detail || detail;
+    } catch {}
+    throw new Error(detail);
+  }
+
+  return response.json();
+}
